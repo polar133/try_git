@@ -1,0 +1,155 @@
+<?page title="Moopa" contentType="text/html;charset=UTF-8"?>
+<?init class="org.zkoss.zk.ui.util.Composition" arg0="/WEB-INF/templates/default/template.zul"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit"?>
+
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+<?component name="toolbatbutton_usuario"    macroURI="/WEB-INF/sinergia/modules/system/userProperties/toolbarbutton_usuario.zul"  inline="true"?>
+
+<zk>
+
+	<zscript src="/WEB-INF/sinergia/commons/configureContext.zs" />
+
+	<menubar width="100%" self="@{define(barra)}"
+		use="com.sinergia.vista.zk.controls.MainMenu"
+		if="${usuario != null and usuario ne app.securityConfig.guestUser}">
+	</menubar>
+
+
+	<div align="center" self="@{define(areatrabajo)}">
+
+
+<columnlayout>
+   <columnchildren width="70%" style="padding: 5px 1px">
+    <panel height="100%"  border="normal" collapsible="true">
+      <panelchildren>
+      
+      
+      
+      </panelchildren>
+    </panel>
+  </columnchildren>
+  
+  
+  <columnchildren width="30%" style="padding: 5px 1px">
+    <panel height="50%" title="Entrada al Sistema" border="normal" collapsible="true">
+      <panelchildren>
+      
+     <div align="center" if="${usuario == null or usuario eq app.securityConfig.guestUser}">
+		<vbox align="center">
+			<panel width="500px" 
+				border="normal" framable="false"
+				if="${usuario == null or usuario eq app.securityConfig.guestUser}">
+				<panelchildren>
+					<grid>
+						<rows>
+							<row>Usuario</row>
+							<row>
+								<textbox id="textLogin" />
+							</row>
+							<row>Contrasena</row>
+							<row>
+								<textbox id="textContrasena"
+									type="password">
+									<attribute name="onOK">
+								<![CDATA[
+	try {
+		usuario = servicioAutenticarUsuario.validarCredenciales(
+				textLogin.value, textContrasena.value);
+		if (usuario != null) {
+			sinergiaCtx.setUsuarioActual(usuario);
+			Executions.sendRedirect("/index.zul");
+		}
+	} catch (SinergiaException sinerex) {
+		Messagebox
+				.show(sinerex.message, "Error", Messagebox.OK, Messagebox.ERROR);
+	}
+]]>
+								</attribute>
+								</textbox>
+							</row>
+							<row spans="2">
+								<button label="Entrar">
+									<attribute name="onClick">
+		<![CDATA[
+	try {
+		usuario = servicioAutenticarUsuario.validarCredenciales(
+				textLogin.value, textContrasena.value);
+		if (usuario != null) {
+			sinergiaCtx.setUsuarioActual(usuario);
+			Executions.sendRedirect("/index.zul");
+		}
+	} catch (SinergiaException sinerex) {
+		Messagebox
+				.show(sinerex.message, "Error", Messagebox.OK, Messagebox.ERROR);
+	}
+]]>						
+						</attribute>
+
+								</button>
+							</row>
+						</rows>
+					</grid>
+				</panelchildren>
+			</panel>
+		</vbox>
+	</div>
+     
+      
+      
+      </panelchildren>
+    </panel>
+    <panel height="50%" title="2" border="normal" collapsible="true">
+      <panelchildren>
+      
+      
+      </panelchildren>
+    </panel>
+  </columnchildren>
+
+
+</columnlayout>
+
+
+	</div>
+
+	<window self="@{define(areatrabajo)}" id="targetArea" contentStyle="overflow:auto"
+		use="com.sinergia.vista.zk.controls.TargetWindow" height="100%"
+		if="${usuario != null and usuario ne app.securityConfig.guestUser}">
+		<include
+			src="/WEB-INF/sinergia/modules/system/userProperties/user_workspace.zul"
+			if="${usuario != null and usuario ne app.securityConfig.guestUser}" />
+	</window>
+
+	<toolbar self="@{define(piepagina)}" align="end"
+		if="${usuario != null and usuario ne app.securityConfig.guestUser}">
+		<toolbarbutton label="Espacio de Trabajo"
+			image="/images/icons/folder_window.png">
+			<attribute name="onClick">
+			<![CDATA[
+	{
+		command = new ShowCommand();
+		command.archivoZul = "/WEB-INF/sinergia/modules/system/userProperties/user_workspace.zul";
+		command.execute(targetArea);
+	}
+]]>
+</attribute>
+		</toolbarbutton>
+		<toolbatbutton_usuario p_usuario="${usuario}" />
+		<toolbarbutton image="/images/icons/exit.png" label="Salir">
+			<attribute name="onClick">
+			<![CDATA[
+	{
+		session.invalidate();
+		Executions.sendRedirect("/index.zul");
+	}
+]]>
+</attribute>
+
+		</toolbarbutton>
+	</toolbar>
+
+
+
+
+</zk>
